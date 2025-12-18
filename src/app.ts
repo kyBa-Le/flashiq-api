@@ -3,19 +3,19 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
 import routes from './routes';
+import dotenv from 'dotenv';
+import { apiLimiter } from './middlewares/rateLimiter';
 
 const app = express();
 
-// Load file YAML
+dotenv.config();
+
 const swaggerDocument = YAML.load(path.join(__dirname, '../swagger.yaml'));
 
-// Middleware
 app.use(express.json());
 
-// API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Routes
-app.use('/api', routes);
+app.use('/api', apiLimiter, routes);
 
 export default app;

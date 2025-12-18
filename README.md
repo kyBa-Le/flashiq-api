@@ -41,6 +41,29 @@ DATABASE_URL="postgresql://root:flashiq123@localhost:5432/flashiqdb?createDataba
 npx prisma generate
 ```
 
+### Step 4: Redis Setup for Rate Limiting
+
+We will use **Docker** to run **Redis** for rate limiting functionality.
+
+#### 🐳 4.1. Run Redis Docker Container
+
+```bash
+docker run --name redis-server -p 6379:6379 -d redis:latest
+```
+
+#### 🔄 4.2. Start Redis (if stopped)
+
+```bash
+docker start redis-server
+```
+
+#### ✅ 4.3. Verify Redis is running
+
+```bash
+docker exec -it redis-server redis-cli ping
+```
+Should return `PONG` if Redis is working correctly.
+
 
 ## 🚀 Quick run using Docker compose
 You should have the Docker desktop and it is running
