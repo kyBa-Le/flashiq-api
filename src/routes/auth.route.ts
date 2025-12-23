@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   login,
+  refresh,
   register,
   resendVerificationEmail,
   verifyEmail,
@@ -8,6 +9,7 @@ import {
 import { validate } from '../middlewares/validate.middleware';
 import {
   loginSchema,
+  refreshTokenSchema,
   registerSchema,
   resendEmailSchema,
 } from '../validations/auth.schema';
@@ -21,5 +23,6 @@ router.post(
   resendVerificationEmail
 );
 router.post('/login', validate(loginSchema), login);
+router.post('/refresh', validate(refreshTokenSchema), refresh);
 
 export default router;
