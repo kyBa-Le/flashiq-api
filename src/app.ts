@@ -13,6 +13,6 @@ app.use(express.json());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-app.use('/api', apiLimiter, routes);
+app.use('/api/v1', apiLimiter, routes);
 
 export default app;
