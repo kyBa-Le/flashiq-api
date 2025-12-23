@@ -4,6 +4,7 @@ import {
   findUserByVerifyToken,
   markEmailAsVerified,
   updateVerifyToken,
+  findById,
 } from './auth.repository';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
@@ -68,4 +69,24 @@ export const resendVerificationEmail = async (email: string) => {
   await updateVerifyToken(user.id, emailVerifyToken, emailVerifyExpiry);
 
   return { emailVerifyToken, user };
+};
+
+export const findByEmailAndPassword = async (
+  email: string,
+  password: string
+) => {
+  const user = await findByEmail(email);
+  if (!user) {
+    return null;
+  }
+  const hashedPassword = await bcrypt.hash(password, user.salt);
+  if (hashedPassword === user.password) {
+    return user;
+  }
+  return null;
+};
+
+export const getUserById = async (id: string) => {
+  const user = await findById(id);
+  return user;
 };

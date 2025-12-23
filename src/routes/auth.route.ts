@@ -1,11 +1,16 @@
 import { Router } from 'express';
 import {
+  login,
   register,
   resendVerificationEmail,
   verifyEmail,
 } from '../app/auth/auth.controller';
 import { validate } from '../middlewares/validate.middleware';
-import { registerSchema, resendEmailSchema } from '../validations/auth.schema';
+import {
+  loginSchema,
+  registerSchema,
+  resendEmailSchema,
+} from '../validations/auth.schema';
 const router = Router();
 
 router.post('/register', validate(registerSchema), register);
@@ -15,5 +20,6 @@ router.post(
   validate(resendEmailSchema),
   resendVerificationEmail
 );
+router.post('/login', validate(loginSchema), login);
 
 export default router;

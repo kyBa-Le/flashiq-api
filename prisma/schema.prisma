@@ -13,13 +13,13 @@ model User {
   email             String         @unique
   password          String
   salt              String
-  avatar            String
+  avatar            String?
   isEmailVerified   Boolean        @default(false)
   emailVerifyToken  String?        @unique
   emailVerifyExpiry DateTime?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  RefreshToken      RefreshToken[]
+  refreshToken      RefreshToken[]
   Set               Set[]
 }
 
@@ -42,5 +42,5 @@ model RefreshToken {
   userId       String
   expiresAt    DateTime
   createdAt    DateTime @default(now())
-  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

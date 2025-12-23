@@ -3,10 +3,18 @@ import {
   createUser,
   verifyEmailService,
   resendVerificationEmail as resendVerificationEmailService,
+  findByEmailAndPassword,
+  getUserById,
 } from './auth.service';
 import { RegisterDto } from './auth.dto';
 import { sendVerifyEmail } from '../../utils/mail';
 import { prisma } from '../../utils/prisma';
+import {
+  extractPayloadFromAccessToken,
+  generateAccessToken,
+  generateToken,
+  validateRefreshToken,
+} from '../../utils/jwtHelper';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -115,4 +123,70 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
       message: 'Internal server error',
     });
   }
+};
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await findByEmailAndPassword(email, password);
+    if (user) {
+      const accessToken = generateToken(user).accessToken;
+      const refreshToken = generateToken(user).refreshToken;
+
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      await prisma.refreshToken.create({
+        data: {
+          refreshToken: refreshToken,
+          userId: user.id,
+          expiresAt: expiresAt,
+          createdAt: new Date(),
+        },
+      });
+      return res.json({
+        message: 'Login successfully',
+        data: {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        },
+      });
+    } else {
+      return res.status(400).json({
+        message: 'Email or password is incorrect',
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: 'Some errors occur while processing request',
+    });
+  }
+};
+
+export const refresh = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.status(401).send('No token found');
+  validateRefreshToken(refreshToken);
+
+  const userId = extractPayloadFromAccessToken(refreshToken).id;
+  const user = await getUserById(userId);
+  if (!user) {
+    return res.status(400).json({
+      message: 'Refresh token is invalid',
+    });
+  }
+
+  const payload = {
+    id: user.id,
+    email: user.email,
+  };
+  const accessToken = generateAccessToken(payload);
+  return res.status(200).json({
+    message: 'Refresh token successfully',
+    data: {
+      accessToken: accessToken,
+    },
+  });
 };
