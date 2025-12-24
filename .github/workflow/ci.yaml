@@ -1,0 +1,39 @@
+name: CI - FlashIq - Express TS
+
+on:
+  pull_request:
+    branches:
+      - "main"
+      - "dev"
+  push:
+    branches:
+      - "chore/deployment*"
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Start server
+        run: |
+          npm start &
+          sleep 5
+
+      - name: Health check
+        run: curl --fail http://localhost:3000/health
