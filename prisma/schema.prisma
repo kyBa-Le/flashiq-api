@@ -24,7 +24,7 @@ model User {
 }
 
 model Set {
-  id          String   @id
+  id          String   @id @default(uuid())
   title       String
   description String?
   ownerId     String
@@ -32,7 +32,8 @@ model Set {
   viewCount   Int      @default(0)
   cloneCount  Int      @default(0)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime @updatedAt
+  cards       Card[]
   User        User     @relation(fields: [ownerId], references: [id])
 }
 
@@ -40,7 +41,19 @@ model RefreshToken {
   id           Int      @id @default(autoincrement())
   refreshToken String   @unique
   userId       String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Card {
+  id         String   @id @default(uuid())
+  term       String
+  definition String
+  example    String?
+  image_url  String?
+  setId      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  set        Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
 }
