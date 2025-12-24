@@ -35,7 +35,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User created successfully"
+                    example: 'User created successfully'
                   user:
                     type: object
                     properties:
@@ -55,7 +55,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Email already exists"
+                    example: 'Email already exists'
                   errors:
                     type: array
                     items:
@@ -69,7 +69,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Internal server error"
+                    example: 'Internal server error'
 
   /auth/verify-email:
     get:
@@ -93,7 +93,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Email verified successfully"
+                    example: 'Email verified successfully'
         '400':
           description: Invalid or expired token
           content:
@@ -103,14 +103,13 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid token"
+                    example: 'Invalid token'
         '500':
           description: Internal server error
 
   /auth/login:
     post:
-      tags:
-        - Auth
+      tags: [Auth]
       summary: Login user (E.02)
       requestBody:
         required: true
@@ -118,15 +117,10 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - email
-                - password
+              required: [email, password]
               properties:
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
+                email: { type: string }
+                password: { type: string }
       responses:
         '200':
           description: Login successfully
@@ -135,7 +129,76 @@ paths:
               schema:
                 type: object
                 properties:
-                  accessToken:
+                  message:
                     type: string
-                  refreshToken:
+                    example: Login successfully
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      refreshToken:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
+                    example: Validation error
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Password must be at least 8 characters long"]
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+      responses:
+        '200':
+          description: Refresh token successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Refresh token successfully
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Refresh token is required"]
