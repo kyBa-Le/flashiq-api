@@ -2,9 +2,9 @@ name: CI - FlashIq - Express TS
 
 on:
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "test-main"]
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "test-main"]
 
 jobs:
   integration-test:
