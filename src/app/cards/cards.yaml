@@ -1,29 +1,78 @@
 paths:
-  /sets/{id}/cards:
-    get:
+  /sets/{id}/card:
+    post:
       tags:
         - Cards
-      summary: Get all cards in a Set (For Study B.01)
+      summary: Add single card to Set
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+          description: Set ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - term
+                - definition
+              properties:
+                term:
+                  type: string
+                  example: "hello"
+                definition:
+                  type: string
+                  example: "a greeting"
+                example:
+                  type: string
+                  example: "Hello world!"
+                image_url:
+                  type: string
+                  format: uri
+                  example: "https://example.com/image.jpg"
       responses:
-        '200':
-          description: List of cards
+        '201':
+          description: Card created successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Card'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Card inserted successfully"
+                  data:
+                    $ref: '#/components/schemas/CardResponse'
+        '400':
+          description: Bad request - validation error or missing Set ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Set not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
+  /sets/{id}/card/bulk:
     post:
       tags:
         - Cards
-      summary: Add single card to Set (A.03)
+      summary: Bulk Import Cards
       security:
         - bearerAuth: []
       parameters:
@@ -32,74 +81,124 @@ paths:
           required: true
           schema:
             type: string
+          description: Set ID
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Card'
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required:
+                      - term
+                      - definition
+                    properties:
+                      term:
+                        type: string
+                        example: "hello"
+                      definition:
+                        type: string
+                        example: "a greeting"
+                      example:
+                        type: string
+                        example: "Hello world!"
+                      image_url:
+                        type: string
+                        format: uri
+                        example: "https://example.com/image.jpg"
+            example:
+              data:
+                - term: "hello"
+                  definition: "a greeting"
+                  example: "Hello world!"
+                - term: "goodbye"
+                  definition: "a farewell"
       responses:
         '201':
-          description: Card created
+          description: Cards created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Cards inserted successfully"
+                  data:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                        example: 2
+        '400':
+          description: Bad request - validation error, missing Set ID, or invalid data array
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Set not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
-  /sets/{id}/cards/bulk:
-    post:
-      tags:
-        - Cards
-      summary: Bulk Import Cards (A.05)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
+components:
+  schemas:
+    CardResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        term:
+          type: string
+          example: "hello"
+        definition:
+          type: string
+          example: "a greeting"
+        example:
+          type: string
+          example: "Hello world!"
+        image_url:
+          type: string
+          format: uri
+          example: "https://example.com/image.jpg"
+        setId:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174001"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00.000Z"
+    
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Some errors occur while processing request"
+        errors:
+          type: array
+          items:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Card'
-      responses:
-        '201':
-          description: Multiple cards created
-
-  /cards/{cardId}:
-    put:
-      tags:
-        - Cards
-      summary: Update a Card (A.03)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: cardId
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Card'
-      responses:
-        '200':
-          description: Card updated
-
-    delete:
-      tags:
-        - Cards
-      summary: Delete a Card (A.03)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: cardId
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Card deleted
+          example: ["Set not found"]
