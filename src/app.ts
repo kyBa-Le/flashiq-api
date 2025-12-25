@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { apiLimiter } from './middlewares/rateLimiter.middleware';
 import { specs } from './docs/swagger';
 import { corsConfig } from './config/cors';
+import { globalExceptionHandler } from './middlewares/exceptionHadler.middleware';
 
 const app = express();
 
@@ -24,5 +25,7 @@ app.get('/health', (_req, res) => {
     uptime: process.uptime(),
   });
 });
+
+app.use(globalExceptionHandler);
 
 export default app;
