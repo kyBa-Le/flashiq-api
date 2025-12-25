@@ -1,4 +1,5 @@
 import { User } from '@prisma/client';
+import { Request } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 export const generateToken = (user: User) => {
   const payload: JwtPayload = {
@@ -48,4 +49,17 @@ export const extractPayloadFromRefreshToken = (token: string) => {
     process.env.REFRESH_TOKEN_SECRET as string
   ) as JwtPayload;
   return payload;
+};
+
+export const getAccessTokenFromHeader = (req: Request) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) {
+    throw new Error('Unauthenticated request');
+  } else {
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      throw new Error('Unauthenticated request');
+    }
+    return token;
+  }
 };

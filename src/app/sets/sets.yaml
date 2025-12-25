@@ -30,7 +30,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Set'
 
-  /sets/my-sets:
+  /users/{id}/sets:
     get:
       tags:
         - Sets

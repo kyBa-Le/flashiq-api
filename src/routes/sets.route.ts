@@ -1,13 +1,13 @@
 import { Router } from 'express';
-import { SetsController } from '../app/sets/sets.controller';
+import { SetController } from '../app/sets/sets.controller';
 import { validate } from '../middlewares/validate.middleware';
 import { createSetSchema } from '../validations/set.schema';
 
 const router = Router();
 
-router.post('/', validate(createSetSchema), SetsController.create);
-router.get('/:id', SetsController.getById);
-router.put('/:id', SetsController.updateSet);
-router.delete('/:id', SetsController.deleteSet);
+router.post('/', validate(createSetSchema), SetController.create);
+router.get('/:id', SetController.getById);
+router.put('/:id', SetController.updateSet);
+router.delete('/:id', SetController.deleteSet);
 
 export default router;

@@ -1,10 +1,14 @@
-import { SetsService } from './sets.service';
+import {
+  extractPayloadFromAccessToken,
+  getAccessTokenFromHeader,
+} from '../../utils/jwtHelper';
+import { SetService } from './sets.service';
 import { Request, Response } from 'express';
 
-export const SetsController = {
+export const SetController = {
   async create(req: Request, res: Response) {
     try {
-      const data = await SetsService.createSet(req.body);
+      const data = await SetService.createSet(req.body);
       const { id, title, description, isPublic, ownerId } = data;
       return res.status(201).json({
         message: 'Created set successfully',
@@ -19,11 +23,34 @@ export const SetsController = {
     }
   },
 
+  async getSetByUser(req: Request, res: Response) {
+    try {
+      const token = getAccessTokenFromHeader(req);
+      const currentUserId = extractPayloadFromAccessToken(token).id;
+      const userId = req.params.userId;
+      if (currentUserId !== userId) {
+        return res
+          .status(403)
+          .json({ message: 'You do not have permission to view this data' });
+      }
+      const userSets = await SetService.findByUserId(userId);
+      return res.status(200).json({
+        message: 'Data retrieved successfully',
+        data: userSets,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: 'Server error',
+        error: error.message,
+      });
+    }
+  },
+
   async getById(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const inclueCards = req.query.inclueCards === 'true';
-      const data = await SetsService.findById(id, inclueCards);
+      const data = await SetService.findById(id, inclueCards);
 
       if (!data) {
         return res.status(404).json({
@@ -48,7 +75,7 @@ export const SetsController = {
   async updateSet(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const data = await SetsService.updateSet(id, req.body);
+      const data = await SetService.updateSet(id, req.body);
 
       if (!data) {
         return res.status(404).json({
@@ -73,7 +100,7 @@ export const SetsController = {
   async deleteSet(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const data = await SetsService.deleteSet(id);
+      const data = await SetService.deleteSet(id);
 
       if (!data) {
         return res.status(404).json({
