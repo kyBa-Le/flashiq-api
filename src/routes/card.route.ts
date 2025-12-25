@@ -1,17 +1,21 @@
 import { Router } from 'express';
 import {
   deleteCard,
-  getAllCards,
   getSingleCardById,
   updateCard,
 } from '../app/cards/card.controller';
 import { validate } from '../middlewares/validate.middleware';
 import { singleCardSchema } from '../validations/card.schema';
+import { authenticateAccessToken } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-router.get('/', getAllCards);
-router.get('/:id', getSingleCardById);
-router.delete('/:id', deleteCard);
-router.put('/:id', validate(singleCardSchema), updateCard);
+router.get('/:id', authenticateAccessToken, getSingleCardById);
+router.delete('/:id', authenticateAccessToken, deleteCard);
+router.put(
+  '/:id',
+  validate(singleCardSchema),
+  authenticateAccessToken,
+  updateCard
+);
 export default router;

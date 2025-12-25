@@ -77,6 +77,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/Set'
 
+  /sets/{id}/cards:
+    get:
+      tags:
+        - Sets
+      summary: Get all cards of a Set
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Set ID
+      responses:
+        '200':
+          description: List of cards in the set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Card'
+
     put:
       tags:
         - Sets

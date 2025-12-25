@@ -40,8 +40,10 @@ export const findCardById = async (cardId: string) => {
   });
 };
 
-export const findAllCards = async () => {
-  return await prisma.card.findMany();
+export const findAllCards = async (setId: string) => {
+  return await prisma.card.findMany({
+    where: { setId },
+  });
 };
 
 export const updateCardById = async (

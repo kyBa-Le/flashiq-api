@@ -38,8 +38,11 @@ export const getCardById = async (cardId: string) => {
   return await findCardById(cardId);
 };
 
-export const getCardList = async () => {
-  return await findAllCards();
+export const getCardList = async (setId: string) => {
+  if (!setId) {
+    throw new Error('Set id is required');
+  }
+  return await findAllCards(setId);
 };
 
 export const updateSingleCard = async (cardId: string, payload: CardDto) => {
