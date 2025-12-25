@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { SetController } from '../app/sets/sets.controller';
+import { SetController } from '../app/sets/set.controller';
 import { validate } from '../middlewares/validate.middleware';
 import { createSetSchema } from '../validations/set.schema';
 

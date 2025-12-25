@@ -10,8 +10,4 @@ export const createSetSchema = Joi.object({
   isPublic: Joi.boolean().default(false).messages({
     'boolean.base': 'isPublic must be of type true/false',
   }),
-
-  ownerId: Joi.string().required().messages({
-    'any.required': 'owner ID is required.',
-  }),
 });
