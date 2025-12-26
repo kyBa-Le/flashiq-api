@@ -1,8 +1,10 @@
 import { User } from '@prisma/client';
 import { Request } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { TokenPayload } from '../app/auth/auth.type';
+
 export const generateToken = (user: User) => {
-  const payload: JwtPayload = {
+  const payload: TokenPayload = {
     id: user.id,
     email: user.email,
   };
@@ -36,18 +38,18 @@ export const generateRefreshToken = (payload: any) => {
 };
 
 export const extractPayloadFromAccessToken = (token: string) => {
-  const payload = jwt.verify(
+  const payload: TokenPayload = jwt.verify(
     token,
     process.env.JWT_SECRET as string
-  ) as JwtPayload;
+  ) as TokenPayload;
   return payload;
 };
 
 export const extractPayloadFromRefreshToken = (token: string) => {
-  const payload = jwt.verify(
+  const payload: TokenPayload = jwt.verify(
     token,
     process.env.REFRESH_TOKEN_SECRET as string
-  ) as JwtPayload;
+  ) as TokenPayload;
   return payload;
 };
 

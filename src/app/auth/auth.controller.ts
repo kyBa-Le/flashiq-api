@@ -15,6 +15,7 @@ import {
   generateToken,
   validateRefreshToken,
 } from '../../utils/jwtHelper';
+import { TokenPayload } from './auth.type';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -71,6 +72,7 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
+  const redirectUrl = process.env.FRONTEND_APP as string;
   try {
     const { token } = req.query;
 
@@ -80,20 +82,16 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
     await verifyEmailService(token as string);
 
-    return res.json({
-      message: 'Email verified successfully',
-    });
+    return res.redirect(redirectUrl + '/verification-success');
   } catch (error: any) {
     if (error.message === 'INVALID_TOKEN') {
-      return res.status(400).json({ message: 'Invalid token' });
+      return res.redirect(redirectUrl + '/verification-failed?status=invalid');
     }
     if (error.message === 'TOKEN_EXPIRED') {
-      return res.status(400).json({ message: 'Token has expired' });
+      return res.redirect(redirectUrl + '/verification-failed?status=expired');
     }
 
-    return res.status(500).json({
-      message: 'Internal server error',
-    });
+    return res.status(500).send('<h1/>Internal server error</h1>');
   }
 };
 
@@ -179,7 +177,7 @@ export const refresh = async (req: Request, res: Response) => {
       });
     }
 
-    const payload = {
+    const payload: TokenPayload = {
       id: user.id,
       email: user.email,
     };
