@@ -1,0 +1,22 @@
+paths:
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Get current user profile (E.03)
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get current user successfully
+                  data:
+                    $ref: '#/components/schemas/User'
+                required:
+                  - message
+                  - data
