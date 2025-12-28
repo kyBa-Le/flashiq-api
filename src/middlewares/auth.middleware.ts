@@ -20,10 +20,11 @@ export const authenticateAccessToken = (
         errors: ['Invalid token'],
       });
     }
-    jwt.verify(token, process.env.JWT_SECRET as string, (err) => {
+    jwt.verify(token, process.env.JWT_SECRET as string, (err, decoded) => {
       if (err) {
         res.status(401).json({ message: 'Token invalid or expired' });
       }
+      (req as any).user = decoded;
       next();
     });
   }

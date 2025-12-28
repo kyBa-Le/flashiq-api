@@ -4,7 +4,7 @@ export const corsConfig = () => {
   const allowedOrigins = (process.env.FRONTEND_URLS || '').split(',');
 
   return cors({
-    origin: (origin, callback) => {
+    origin: (origin: any, callback: any) => {
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {

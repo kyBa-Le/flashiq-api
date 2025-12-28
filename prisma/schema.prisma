@@ -21,6 +21,7 @@ model User {
   updatedAt         DateTime       @updatedAt
   refreshToken      RefreshToken[]
   Set               Set[]
+  studyRecords      StudyRecord[]
 }
 
 model Set {
@@ -35,6 +36,7 @@ model Set {
   updatedAt   DateTime @updatedAt
   cards       Card[]
   User        User     @relation(fields: [ownerId], references: [id])
+  studyRecords  StudyRecord[]
 }
 
 model RefreshToken {
@@ -56,4 +58,20 @@ model Card {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   set        Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
+  studyRecords  StudyRecord[]
 }
+
+model StudyRecord {
+  id            String    @id @default(uuid())
+  userId        String
+  cardId        String
+  setId         String 
+  score         Float     @default(0)
+  last_reviewed DateTime?
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card          Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  set           Set       @relation(fields: [setId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, cardId])
+}
+
