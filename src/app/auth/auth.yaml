@@ -36,7 +36,7 @@ paths:
                   message:
                     type: string
                     example: 'User created successfully'
-                  user:
+                  data:
                     type: object
                     properties:
                       username:
@@ -202,3 +202,46 @@ paths:
                     items:
                       type: string
                     example: ["Refresh token is required"]
+
+  /auth/logout:
+    get:
+      tags:
+        - Auth
+      summary: Logout current user
+      description: >
+        Logs out the currently authenticated user by invalidating the access token.
+        The client should discard the token after a successful response.
+      operationId: logoutUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+        '401':
+          description: Unauthorized – invalid or missing token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error

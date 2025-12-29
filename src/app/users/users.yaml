@@ -20,3 +20,43 @@ paths:
                 required:
                   - message
                   - data
+                  
+  /users/{userId}/sets:
+    get:
+      tags:
+        - Users
+      summary: Get Dashboard Sets (A.02)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: ID của người dùng cần lấy dữ liệu
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: List of user's sets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get successfully
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Set'

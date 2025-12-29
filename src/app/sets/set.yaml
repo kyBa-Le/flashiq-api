@@ -19,7 +19,7 @@ paths:
                   type: string
                 description:
                   type: string
-                is_public:
+                isPublic:
                   type: boolean
                   default: false
       responses:
@@ -29,35 +29,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Set'
-
-  /users/{id}/sets:
-    get:
-      tags:
-        - Sets
-      summary: Get Dashboard Sets (A.02)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 10
-      responses:
-        '200':
-          description: List of user's sets
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Set'
-
   /sets/{id}:
     get:
       tags:

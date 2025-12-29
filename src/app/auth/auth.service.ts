@@ -5,10 +5,12 @@ import {
   markEmailAsVerified,
   updateVerifyToken,
   findById,
+  removeUserToken,
 } from './auth.repository';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { ENV } from '../../config/env';
+import { BaseException } from '../../errors/BaseException';
 
 export const createUser = async (
   email: string,
@@ -17,7 +19,7 @@ export const createUser = async (
 ) => {
   const existingUser = await findByEmail(email);
   if (existingUser) {
-    throw new Error('Email already exists');
+    throw new BaseException(400, 'Email already exists');
   }
   const salt = await bcrypt.genSalt(ENV.BCRYPT_SALT_ROUNDS);
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -89,4 +91,12 @@ export const findByEmailAndPassword = async (
 export const getUserById = async (id: string) => {
   const user = await findById(id);
   return user;
+};
+
+export const deleteTokenByUseId = async (userId: string) => {
+  try {
+    return await removeUserToken(userId);
+  } catch (error: any) {
+    throw new BaseException(500, error.message);
+  }
 };

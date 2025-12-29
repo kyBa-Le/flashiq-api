@@ -2,6 +2,7 @@ import { User } from '@prisma/client';
 import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 import { TokenPayload } from '../app/auth/auth.type';
+import { BaseException } from '../errors/BaseException';
 
 export const generateToken = (user: User) => {
   const payload: TokenPayload = {
@@ -56,11 +57,11 @@ export const extractPayloadFromRefreshToken = (token: string) => {
 export const getAccessTokenFromHeader = (req: Request) => {
   const authHeader = req.headers['authorization'];
   if (!authHeader) {
-    throw new Error('Unauthenticated request');
+    throw new BaseException(401, 'Unauthenticated request');
   } else {
     const token = authHeader.split(' ')[1];
     if (!token) {
-      throw new Error('Unauthenticated request');
+      throw new BaseException(401, 'Unauthenticated request');
     }
     return token;
   }
