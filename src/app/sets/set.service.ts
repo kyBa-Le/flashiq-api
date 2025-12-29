@@ -1,3 +1,5 @@
+import { BaseSuccessResponse } from '../../dto/SuccessResponse';
+import { BaseException } from '../../errors/BaseException';
 import { CreateSetDto } from './set.dto';
 import { SetRepository } from './set.repository';
 
@@ -5,12 +7,15 @@ export const SetService = {
   async createSet(data: CreateSetDto) {
     return await SetRepository.createSet(data);
   },
+
   async findByUserId(userId: string, page: number, limit: number) {
     return await SetRepository.findByUserId(userId, page, limit);
   },
+
   async findById(id: string, inclueCards: boolean = false) {
     return await SetRepository.findById(id, inclueCards);
   },
+
   async updateSet(
     setId: string,
     currentUserId: string,
@@ -48,5 +53,41 @@ export const SetService = {
       throw err;
     }
     return await SetRepository.deleteSet(setId);
+  },
+
+  async searchSets(keyword: string, page: number, limit: number) {
+    try {
+      if (!keyword || keyword.trim() === '') {
+        return new BaseSuccessResponse('No sets found matching your search', {
+          sets: [],
+        });
+      }
+
+      const { sets, totalItems } = await SetRepository.findByTitle(
+        keyword,
+        page,
+        limit
+      );
+
+      if (sets.length === 0) {
+        return new BaseSuccessResponse('No sets found matching your search', {
+          sets: [],
+        });
+      }
+
+      const totalPages = Math.ceil(totalItems / limit);
+      const data = {
+        sets,
+        pagination: { totalItems, totalPages, currentPage: page, limit },
+      };
+
+      return new BaseSuccessResponse('Sets retrieved successfully', data);
+    } catch (error) {
+      const err = error as { status?: number; message?: string };
+      throw new BaseException(
+        err.status || 500,
+        err.message || 'Internal server error'
+      );
+    }
   },
 };

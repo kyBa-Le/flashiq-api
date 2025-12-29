@@ -1,4 +1,22 @@
 paths:
+  /sets/search:
+    get:
+      tags:
+        - Sets  
+      summary: Search Public Sets (D.01)
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+          description: Keyword to search in title
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Set' }
   /sets:
     post:
       tags:

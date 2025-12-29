@@ -79,4 +79,25 @@ export const SetRepository = {
       throw err;
     }
   },
+
+  async findByTitle(keyword: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const [sets, totalItems] = await Promise.all([
+      prisma.set.findMany({
+        where: {
+          title: { contains: keyword, mode: 'insensitive' },
+        },
+        skip: skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.set.count({
+        where: {
+          title: { contains: keyword, mode: 'insensitive' },
+        },
+      }),
+    ]);
+
+    return { sets, totalItems };
+  },
 };

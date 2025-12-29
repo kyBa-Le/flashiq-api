@@ -12,6 +12,7 @@ import { authenticateAccessToken } from '../middlewares/auth.middleware';
 
 const router = Router();
 
+router.get('/search', SetController.search);
 router.post('/', validate(createSetSchema), SetController.create);
 router.get('/:id', SetController.getById);
 router.put('/:id', SetController.updateSet);
