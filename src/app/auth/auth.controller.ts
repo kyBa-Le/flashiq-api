@@ -164,34 +164,27 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const refresh = async (req: Request, res: Response) => {
-  try {
-    const { refreshToken } = req.body;
-    if (!refreshToken) return res.status(401).send('No token found');
-    validateRefreshToken(refreshToken);
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.status(401).send('No token found');
+  validateRefreshToken(refreshToken);
 
-    const userId = extractPayloadFromRefreshToken(refreshToken).id;
-    const user = await getUserById(userId);
-    if (!user) {
-      return res.status(400).json({
-        message: 'Refresh token is invalid',
-      });
-    }
-
-    const payload: TokenPayload = {
-      id: user.id,
-      email: user.email,
-    };
-    const accessToken = generateAccessToken(payload);
-    return res.status(200).json({
-      message: 'Refresh token successfully',
-      data: {
-        accessToken: accessToken,
-      },
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      message: 'Some errors occur while processing request',
-      errors: [error.message],
+  const userId = extractPayloadFromRefreshToken(refreshToken).id;
+  const user = await getUserById(userId);
+  if (!user) {
+    return res.status(400).json({
+      message: 'Refresh token is invalid',
     });
   }
+
+  const payload: TokenPayload = {
+    id: user.id,
+    email: user.email,
+  };
+  const accessToken = generateAccessToken(payload);
+  return res.status(200).json({
+    message: 'Refresh token successfully',
+    data: {
+      accessToken: accessToken,
+    },
+  });
 };

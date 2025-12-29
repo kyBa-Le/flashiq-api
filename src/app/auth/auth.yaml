@@ -36,7 +36,7 @@ paths:
                   message:
                     type: string
                     example: 'User created successfully'
-                  user:
+                  data:
                     type: object
                     properties:
                       username:
