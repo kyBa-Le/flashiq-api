@@ -9,6 +9,7 @@ import {
 } from '../app/cards/card.controller';
 import { bulkCardSchema, singleCardSchema } from '../validations/card.schema';
 import { authenticateAccessToken } from '../middlewares/auth.middleware';
+import { getStudyRecords } from '../app/study_records/study_record.controller';
 
 const router = Router();
 
@@ -30,5 +31,7 @@ router.post(
   authenticateAccessToken,
   createCardController
 );
+
+router.get('/:id/study-records', authenticateAccessToken, getStudyRecords);
 
 export default router;

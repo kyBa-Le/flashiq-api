@@ -3,6 +3,7 @@ import authRoutes from './auth.route';
 import usersRoutes from './user.route';
 import setRoutes from './set.route';
 import cardRoutes from './card.route';
+import studyRecordRoutes from './studyRecord.route';
 
 const router = Router();
 
@@ -10,5 +11,6 @@ router.use('/auth', authRoutes);
 router.use('/users', usersRoutes);
 router.use('/sets', setRoutes);
 router.use('/cards', cardRoutes);
+router.use('/study-records', studyRecordRoutes);
 
 export default router;
