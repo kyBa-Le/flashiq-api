@@ -1,5 +1,4 @@
 import { BaseSuccessResponse } from '../../dto/SuccessResponse';
-import { BaseErrorResponse } from '../../dto/ErrorResponse';
 import {
   countCartInSet,
   countStudyRecord,
@@ -11,6 +10,7 @@ import {
   insertStudyRecords,
   updateScore,
 } from './study_record.repository';
+import { BaseException } from '../../errors/BaseException';
 
 export const getStudyRecordspProgress = async (
   userId: string,
@@ -50,10 +50,8 @@ export const getStudyRecordspProgress = async (
       'Study records retrieved successfully',
       data
     );
-  } catch (error) {
-    return new BaseErrorResponse('Internal Server Error', [
-      error instanceof Error ? error.message : 'Unknown error',
-    ]);
+  } catch (error: any) {
+    throw new BaseException(error.status, error.message);
   }
 };
 
@@ -65,18 +63,17 @@ export const updateStudyRecordScore = async (
   try {
     const currentScoreRecord = await findStudyRecordScore(userId, cardId);
     if (!currentScoreRecord) {
-      return new BaseErrorResponse('STUDY_RECORD_NOT_FOUND', [
-        'Study record does not exist',
-      ]);
+      throw new BaseException(400, 'Study record does not exist');
     }
     let score = currentScoreRecord.score;
     score += isCorrect ? 0.2 : -0.3;
-    score = Math.min(1, Math.max(0, score));
+    score = Math.round(Math.min(1, Math.max(0, score)) * 10) / 10;
     const data = await updateScore(userId, cardId, score);
     return new BaseSuccessResponse('Score updated successfully', data);
-  } catch (error) {
-    return new BaseErrorResponse('Internal Server Error', [
-      error instanceof Error ? error.message : 'Unknown error',
-    ]);
+  } catch (error: any) {
+    throw new BaseException(
+      error.status || 500,
+      error.message || 'Internal server error'
+    );
   }
 };
