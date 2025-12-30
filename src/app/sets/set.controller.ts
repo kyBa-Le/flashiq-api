@@ -187,4 +187,21 @@ export const SetController = {
       });
     }
   },
+
+  async getTrending(req: Request, res: Response) {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const data = await SetService.getTrendingSets(limit);
+
+      return res.status(200).json({
+        message: 'Popular sets retrieved successfully',
+        data,
+      });
+    } catch (error) {
+      const err = error as { status?: number; message?: string };
+      return res.status(err.status || 500).json({
+        message: err.message || 'Internal Server Error',
+      });
+    }
+  },
 };

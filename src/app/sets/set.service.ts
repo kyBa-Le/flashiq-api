@@ -111,4 +111,15 @@ export const SetService = {
       );
     }
   },
+
+  async getTrendingSets(limit: number = 10) {
+    try {
+      return await SetRepository.findTopViewed(limit);
+    } catch (_error) {
+      throw {
+        status: 500,
+        message: 'Failed to retrieve popular sets',
+      };
+    }
+  },
 };

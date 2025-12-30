@@ -110,4 +110,18 @@ export const SetRepository = {
 
     return { sets, totalItems };
   },
+
+  async findTopViewed(limit: number) {
+    return await prisma.set.findMany({
+      orderBy: {
+        viewCount: 'desc',
+      },
+      take: limit,
+      include: {
+        _count: {
+          select: { cards: true },
+        },
+      },
+    });
+  },
 };
