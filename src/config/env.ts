@@ -22,4 +22,7 @@ export const ENV = {
 
   MAX_REQUEST: getEnv('MAX_REQUEST', '20'),
   MAX_AUTH_REQUEST: getEnv('MAX_AUTH_REQUEST', '5'),
+
+  GEMINI_API_KEY: getEnv('GEMINI_API_KEY'),
+  GEMINI_MODEL: getEnv('GEMINI_MODEL', 'gemini-2.5-flash'),
 };
