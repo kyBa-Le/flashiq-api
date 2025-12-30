@@ -39,18 +39,30 @@ export const SetRepository = {
         currentPage: page,
       };
     } catch {
-      console.error('Error retrieving sets by userId');
-      const err: any = new Error('Unable to retrieve the list of sets');
+      const err = new Error('Unable to retrieve the list of sets') as Error & {
+        status?: number;
+      };
       err.status = 500;
       throw err;
     }
   },
 
-  async findById(id: string, inclueCards: boolean) {
+  async findById(id: string, includeCards: boolean) {
     return await prisma.set.findUnique({
       where: { id },
       include: {
-        cards: inclueCards,
+        cards: includeCards,
+      },
+    });
+  },
+
+  async incrementViewCount(id: string) {
+    return await prisma.set.update({
+      where: { id },
+      data: {
+        viewCount: {
+          increment: 1,
+        },
       },
     });
   },

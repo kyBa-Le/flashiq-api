@@ -77,7 +77,16 @@ export const SetController = {
     try {
       const { id } = req.params;
       const inclueCards = req.query.inclueCards === 'true';
-      const data = await SetService.findById(id, inclueCards);
+
+      let currentUserId: string | undefined;
+      const token = getAccessTokenFromHeader(req);
+
+      if (token) {
+        const payload = extractPayloadFromAccessToken(token);
+        currentUserId = payload?.id;
+      }
+
+      const data = await SetService.findById(id, inclueCards, currentUserId);
 
       if (!data) {
         throw {

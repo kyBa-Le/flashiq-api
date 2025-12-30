@@ -12,8 +12,29 @@ export const SetService = {
     return await SetRepository.findByUserId(userId, page, limit);
   },
 
-  async findById(id: string, inclueCards: boolean = false) {
-    return await SetRepository.findById(id, inclueCards);
+  async findById(
+    id: string,
+    includeCards: boolean = false,
+    currentUserId?: string
+  ) {
+    const set = await SetRepository.findById(id, includeCards);
+
+    if (!set) return null;
+
+    const isOwner =
+      currentUserId && String(currentUserId) === String(set.ownerId);
+
+    if (!isOwner) {
+      try {
+        await SetRepository.incrementViewCount(id);
+
+        set.viewCount += 1;
+      } catch (error) {
+        console.error('Failed to increment view count:', error);
+      }
+    }
+
+    return set;
   },
 
   async updateSet(
