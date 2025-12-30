@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { CreateSetDto } from './set.dto';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../utils/prisma';
 
 export const SetRepository = {
   async createSet(data: CreateSetDto) {
