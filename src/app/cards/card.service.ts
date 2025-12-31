@@ -70,7 +70,7 @@ export const bulkUpdateCardsBySetId = async (
   oldCards: Card[],
   newCards: CardDto[]
 ) => {
-  return await prisma.$transaction(async (_tx) => {
+  return await prisma.$transaction(async (tx) => {
     const existingCards = await getCardBySetId(setId);
 
     const existingIds = existingCards.map((card) => card.id);
@@ -79,14 +79,10 @@ export const bulkUpdateCardsBySetId = async (
       (id: string) => !updatingIds.includes(id)
     );
 
-    idsToDelete.forEach(async (id) => {
-      await deleteCardById(id);
-    });
-
-    oldCards.forEach(async (card) => {
-      await updateCardById(card.id, card);
-    });
-
-    createBulkCards(setId, newCards);
+    await Promise.all(idsToDelete.map((id) => deleteCardById(id, tx)));
+    await Promise.all(
+      oldCards.map((card) => updateCardById(card.id, card, tx))
+    );
+    await createManyCards(setId, newCards, tx);
   });
 };

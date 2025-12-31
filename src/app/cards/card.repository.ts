@@ -1,4 +1,4 @@
-import { Card } from '@prisma/client';
+import { Card, Prisma } from '@prisma/client';
 import { prisma } from '../../utils/prisma';
 import { CardDto } from './card.dto';
 
@@ -12,14 +12,14 @@ export const findSetById = async (setId: string, tx?: any) => {
 export const createManyCards = async (
   setId: string,
   cards: CardDto[],
-  tx?: any
+  tx?: Prisma.TransactionClient
 ) => {
   const cardData = cards.map((card) => ({
     ...card,
     setId,
   }));
 
-  const client = tx || prisma;
+  const client = tx ?? prisma;
 
   return await client.card.createMany({
     data: cardData,
@@ -49,16 +49,22 @@ export const findCardsBySetId = async (setId: string) => {
 
 export const updateCardById = async (
   cardId: string,
-  data: Partial<CardDto> | Card
+  data: Partial<CardDto> | Card,
+  tx?: Prisma.TransactionClient
 ) => {
-  return prisma.card.update({
+  const client = tx ?? prisma;
+  return client.card.update({
     where: { id: cardId },
     data,
   });
 };
 
-export const deleteCardById = async (cardId: string) => {
-  return prisma.card.delete({
+export const deleteCardById = async (
+  cardId: string,
+  tx?: Prisma.TransactionClient
+) => {
+  const client = tx ?? prisma;
+  return client.card.delete({
     where: { id: cardId },
   });
 };
