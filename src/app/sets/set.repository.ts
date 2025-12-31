@@ -16,16 +16,40 @@ export const SetRepository = {
   async findByUserId(userId: string, page: number, limit: number) {
     const skip = (page - 1) * limit;
 
-    const [sets, totalItems] = await Promise.all([
-      prisma.set.findMany({
-        where: { ownerId: userId },
-        skip: skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.set.count({ where: { ownerId: userId } }),
-    ]);
-    return { sets, totalItems };
+      const [sets, totalItems] = await Promise.all([
+        prisma.set.findMany({
+          where: { ownerId: userId },
+          skip: skip,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            _count: {
+              select: {
+                cards: true,
+              },
+            },
+          },
+        }),
+        prisma.set.count({ where: { ownerId: userId } }),
+      ]);
+      const setsWithCardCount = sets.map((set) => ({
+        ...set,
+        cardCount: set._count.cards,
+        _count: undefined,
+      }));
+
+      return {
+        sets: setsWithCardCount,
+        totalItems,
+        totalPages: Math.ceil(totalItems / limit),
+        currentPage: page,
+      };
+    } catch {
+      console.error('Error retrieving sets by userId');
+      const err: any = new Error('Unable to retrieve the list of sets');
+      err.status = 500;
+      throw err;
+    }
   },
 
   async findById(id: string, includeCards: boolean) {
