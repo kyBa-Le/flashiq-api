@@ -1,6 +1,6 @@
 import { Card } from '@prisma/client';
 import { getCardBySetId } from '../cards/card.service';
-import { MultipleChoiceQuiz, Quiz } from './quiz.type';
+import { Quiz } from './quiz.type';
 import { random, shuffle } from 'lodash';
 import { BaseException } from '../../errors/BaseException';
 import { SALT } from '../../constants/quiz';
@@ -14,11 +14,11 @@ export const getMultipleChoiceQuestions = async (setId: string) => {
       'The number of the cards are not enough to learn this mode'
     );
   }
-  const quizzes: MultipleChoiceQuiz[] = [];
+  const quizzes: Quiz[] = [];
   cards.forEach((card, index) => {
     const correctAnswer = card.definition;
     const choices = generateChoicesFromCards(cards, index);
-    const quiz = new MultipleChoiceQuiz(
+    const quiz = new Quiz(
       card.id,
       card.term,
       card.example ?? null,
@@ -50,6 +50,8 @@ export const getTrueFalseQuestions = async (setId: string) => {
     const quiz = new Quiz(
       card.id,
       card.term,
+      card.example ?? null,
+      card.image_url ?? null,
       choices,
       hashValue(card.definition)
     );
@@ -62,7 +64,14 @@ export const getFillBlankQuestions = async (setId: string) => {
   let cards: Card[] = await getCardBySetId(setId);
   const quizzes: Quiz[] = [];
   cards.forEach((card) => {
-    const quiz = new Quiz(card.id, card.term, null, hashValue(card.definition));
+    const quiz = new Quiz(
+      card.id,
+      card.term,
+      card.example ?? null,
+      card.image_url ?? null,
+      null,
+      hashValue(card.definition.trim())
+    );
     quizzes.push(quiz);
   });
   return shuffle(quizzes);
