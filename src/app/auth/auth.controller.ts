@@ -6,6 +6,8 @@ import {
   findByEmailAndPassword,
   getUserById,
   removeRefreshToken,
+  loginUser,
+  findUserByGoogleTokenPayload,
 } from './auth.service';
 import { RegisterDto } from './auth.dto';
 import { sendVerifyEmail } from '../../utils/mail';
@@ -13,10 +15,11 @@ import { prisma } from '../../utils/prisma';
 import {
   extractPayloadFromRefreshToken,
   generateAccessToken,
-  generateToken,
   validateRefreshToken,
 } from '../../utils/jwtHelper';
 import { TokenPayload } from './auth.type';
+import { BaseSuccessResponse } from '../../dto/SuccessResponse';
+import { extractPayloadFromGoogleIdToken } from './auth.util';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -121,20 +124,7 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await findByEmailAndPassword(email, password);
     if (user) {
-      const accessToken = generateToken(user).accessToken;
-      const refreshToken = generateToken(user).refreshToken;
-
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
-
-      await prisma.refreshToken.create({
-        data: {
-          refreshToken: refreshToken,
-          userId: user.id,
-          expiresAt: expiresAt,
-          createdAt: new Date(),
-        },
-      });
+      const { accessToken, refreshToken } = await loginUser(user);
       return res.json({
         message: 'Login successfully',
         data: {
@@ -189,4 +179,13 @@ export const logout = async (req: Request, res: Response) => {
     message: 'Logout successfully',
     data: [],
   });
+};
+
+export const googleLogin = async (req: Request, res: Response) => {
+  const { token } = req.body;
+  const payload = await extractPayloadFromGoogleIdToken(token);
+  const user = await findUserByGoogleTokenPayload(payload);
+  const tokens = await loginUser(user);
+  const response = new BaseSuccessResponse('Login successfully', tokens);
+  return res.json(response);
 };

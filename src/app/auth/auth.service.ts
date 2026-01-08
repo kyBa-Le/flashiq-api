@@ -6,11 +6,17 @@ import {
   updateVerifyToken,
   findById,
   removeSpecificToken,
+  createRefreshToken,
 } from './auth.repository';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { ENV } from '../../config/env';
 import { BaseException } from '../../errors/BaseException';
+import { TokenPayload } from 'google-auth-library';
+import { getUserByEmail, updateUserById } from '../users/user.respotitory';
+import { verifyGoogleUserPayload } from './auth.util';
+import { User } from '@prisma/client';
+import { generateToken } from '../../utils/jwtHelper';
 
 export const createUser = async (
   email: string,
@@ -81,7 +87,7 @@ export const findByEmailAndPassword = async (
   if (!user) {
     return null;
   }
-  const hashedPassword = await bcrypt.hash(password, user.salt);
+  const hashedPassword = await bcrypt.hash(password, user.salt as string);
   if (hashedPassword === user.password) {
     return user;
   }
@@ -90,6 +96,33 @@ export const findByEmailAndPassword = async (
 
 export const getUserById = async (id: string) => {
   const user = await findById(id);
+  return user;
+};
+
+export const findUserByGoogleTokenPayload = async (
+  userPayload: TokenPayload
+) => {
+  const { email, name, sub } = userPayload;
+  verifyGoogleUserPayload(userPayload);
+
+  let user = await getUserByEmail(email as string);
+  if (!user) {
+    user = await createNewUser(
+      email as string,
+      null,
+      name as string,
+      null,
+      null,
+      null,
+      sub
+    );
+  } else {
+    if (!user.googleId) {
+      user.googleId = sub;
+      user.isEmailVerified = true;
+      user = await updateUserById(user.id, user);
+    }
+  }
   return user;
 };
 
@@ -102,4 +135,11 @@ export const removeRefreshToken = async (refreshToken: string) => {
   } catch (error: any) {
     throw new BaseException(500, error.message);
   }
+};
+
+export const loginUser = async (user: User) => {
+  const accessToken = generateToken(user).accessToken;
+  const refreshToken = generateToken(user).refreshToken;
+  await createRefreshToken(refreshToken, user.id);
+  return { accessToken, refreshToken };
 };

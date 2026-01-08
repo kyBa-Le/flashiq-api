@@ -11,11 +11,12 @@ export const findByEmail = async (email: string) => {
 
 export const createUser = async (
   email: string,
-  password: string,
+  password: string | null,
   name: string,
-  salt: string,
-  emailVerifyToken: string,
-  emailVerifyExpiry: Date
+  salt: string | null,
+  emailVerifyToken: string | null,
+  emailVerifyExpiry: Date | null,
+  googleId: string | null = null
 ) => {
   const user = await prisma.user.create({
     data: {
@@ -26,6 +27,7 @@ export const createUser = async (
       avatar: '',
       emailVerifyToken: emailVerifyToken,
       emailVerifyExpiry: emailVerifyExpiry,
+      googleId: googleId,
     },
   });
   return user;
@@ -75,5 +77,19 @@ export const findById = async (id: string) => {
 export const removeSpecificToken = async (refreshToken: string) => {
   return await prisma.refreshToken.delete({
     where: { refreshToken: refreshToken },
+  });
+};
+
+export const createRefreshToken = async (refreshToken: string, id: string) => {
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
+
+  return await prisma.refreshToken.create({
+    data: {
+      refreshToken: refreshToken,
+      userId: id,
+      expiresAt: expiresAt,
+      createdAt: new Date(),
+    },
   });
 };

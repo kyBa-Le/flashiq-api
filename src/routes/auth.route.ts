@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  googleLogin,
   login,
   logout,
   refresh,
@@ -26,5 +27,6 @@ router.post(
 router.post('/login', validate(loginSchema), login);
 router.post('/refresh', validate(refreshTokenSchema), refresh);
 router.post('/logout', logout);
+router.post('/google', googleLogin);
 
 export default router;

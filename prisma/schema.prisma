@@ -11,32 +11,33 @@ model User {
   id                String         @id @default(uuid())
   username          String
   email             String         @unique
-  password          String
-  salt              String
+  password          String?
+  salt              String?
   avatar            String?
   isEmailVerified   Boolean        @default(false)
   emailVerifyToken  String?        @unique
   emailVerifyExpiry DateTime?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+  googleId          String?
   refreshToken      RefreshToken[]
   Set               Set[]
   studyRecords      StudyRecord[]
 }
 
 model Set {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  ownerId     String
-  isPublic    Boolean  @default(false)
-  viewCount   Int      @default(0)
-  cloneCount  Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  cards       Card[]
-  User        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  studyRecords  StudyRecord[]
+  id           String        @id @default(uuid())
+  title        String
+  description  String?
+  ownerId      String
+  isPublic     Boolean       @default(false)
+  viewCount    Int           @default(0)
+  cloneCount   Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  cards        Card[]
+  User         User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  studyRecords StudyRecord[]
 }
 
 model RefreshToken {
@@ -49,29 +50,28 @@ model RefreshToken {
 }
 
 model Card {
-  id         String   @id @default(uuid())
-  term       String
-  definition String
-  example    String?
-  image_url  String?
-  setId      String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  set        Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
-  studyRecords  StudyRecord[]
+  id           String        @id @default(uuid())
+  term         String
+  definition   String
+  example      String?
+  image_url    String?
+  setId        String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  set          Set           @relation(fields: [setId], references: [id], onDelete: Cascade)
+  studyRecords StudyRecord[]
 }
 
 model StudyRecord {
   id            String    @id @default(uuid())
   userId        String
   cardId        String
-  setId         String 
+  setId         String
   score         Float     @default(0)
   last_reviewed DateTime?
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   card          Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
   set           Set       @relation(fields: [setId], references: [id], onDelete: Cascade)
-  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId, cardId])
 }
-
