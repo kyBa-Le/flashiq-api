@@ -21,6 +21,7 @@ model User {
   updatedAt         DateTime       @updatedAt
   googleId          String?
   refreshToken      RefreshToken[]
+  fcmTokens         FCMToken[]
   Set               Set[]
   studyRecords      StudyRecord[]
 }
@@ -74,4 +75,14 @@ model StudyRecord {
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, cardId])
+}
+
+model FCMToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
