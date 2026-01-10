@@ -3,6 +3,11 @@ export enum Permission {
   EDIT = 'EDIT',
 }
 
+export interface ShareSetRequestDto {
+  setId: string;
+  email: string;
+  permission: Permission;
+}
 export interface ShareSetDto {
   setId: string;
   userId: string;

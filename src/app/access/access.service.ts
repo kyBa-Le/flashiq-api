@@ -1,23 +1,37 @@
 import { BaseException } from '../../errors/BaseException';
 import { AccessRepository } from './access.repository';
 import { SetRepository } from '../sets/set.repository';
-import { ShareSetDto } from './access.dto';
+import { ShareSetRequestDto } from './access.dto';
 import { prisma } from '../../utils/prisma';
 
 export const AccessService = {
-  async shareSet(currentUserId: string, data: ShareSetDto) {
-    const set = await SetRepository.findById(data.setId, false);
-    if (!set) throw new BaseException(404, 'Set not found');
+  async shareSet(currentUserId: string, data: ShareSetRequestDto) {
+    const { setId, email, permission } = data;
 
-    if (set.ownerId !== currentUserId) {
-      throw new BaseException(403, 'Only the owner can share this set');
+    const userToShare = await prisma.user.findUnique({
+      where: { email: email },
+    });
+
+    if (!userToShare) {
+      throw new BaseException(
+        404,
+        'The user with this email address does not exist'
+      );
     }
 
-    if (data.userId === currentUserId) {
-      throw new BaseException(400, 'You cannot share the set with yourself');
+    const set = await SetRepository.findById(setId, false);
+    if (!set || set.ownerId !== currentUserId) {
+      throw new BaseException(
+        403,
+        'You are not allowed to share this set of cards'
+      );
     }
 
-    return await AccessRepository.grantAccess(data);
+    return await AccessRepository.grantAccess({
+      setId,
+      userId: userToShare.id,
+      permission,
+    });
   },
 
   async getAllInforShared(setId: string, currentUserId: string) {

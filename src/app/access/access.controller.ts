@@ -27,7 +27,7 @@ export const AccessController = {
       const payload = extractPayloadFromAccessToken(token);
 
       const data = await AccessService.getAllInforShared(setId, payload.id);
-      return res.status(200).json({ data });
+      return res.status(200).json({ message: 'Retrieve successfully', data });
     } catch (error) {
       next(error);
     }

@@ -1,48 +1,68 @@
-paths:
-  /sets/{id}/access:
-    get:
-      tags: 
-        - Access
-      summary: Get access list for a Set
-      security: [{ bearerAuth: [] }]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: List of users with access
-          content:
-             application/json:
-               schema:
-                 type: array
-                 items:
-                   type: object
-                   properties:
-                      user_id: { type: string }
-                      permission: { type: string, enum: [viewer, editor] }
+  paths:
+    /access/set/{id}:
+      get:
+        tags: 
+          - Access
+        summary: Get access list for a Set
+        security: [{ bearerAuth: [] }]
+        parameters:
+          - in: path
+            name: id
+            required: true
+            schema: { type: string }
+        responses:
+          '200':
+            description: List of users with access
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                        user_id: { type: string }
+                        permission: { type: string, enum: [viewer, editor] }
 
-  /sets/{id}/access/users:
-    post:
+    /access:
+      post:
+        tags: 
+          - Access
+        summary: Invite user to Set 
+        security: [{ bearerAuth: [] }]
+        parameters:
+          - in: path
+            name: id
+            required: true
+            schema: { type: string }
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [email, permission]
+                properties:
+                  email: { type: string }
+                  permission: { type: string, enum: [viewer, editor] }
+        responses:
+          '200':
+            description: Invitation sent/Access granted
+
+    /access/{accessId}:
+      delete:
       tags: 
         - Access
-      summary: Invite user to Set 
+      summary: Revoke access from a user
       security: [{ bearerAuth: [] }]
       parameters:
         - in: path
-          name: id
+          name: accessId
           required: true
           schema: { type: string }
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [email, permission]
-              properties:
-                email: { type: string }
-                permission: { type: string, enum: [viewer, editor] }
+          description: The unique ID of the access record
       responses:
         '200':
-          description: Invitation sent/Access granted
+          description: Access revoked successfully
+        '403':
+          description: Only the owner can revoke access
+        '404':
+          description: Access record not found

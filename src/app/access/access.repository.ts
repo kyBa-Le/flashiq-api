@@ -11,7 +11,11 @@ export const AccessRepository = {
         },
       },
       update: { permission: data.permission },
-      create: data,
+      create: {
+        setId: data.setId,
+        userId: data.userId,
+        permission: data.permission,
+      },
     });
   },
 
