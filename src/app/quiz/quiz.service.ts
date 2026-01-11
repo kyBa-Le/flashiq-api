@@ -70,7 +70,7 @@ export const getFillBlankQuestions = async (setId: string) => {
       card.example ?? null,
       card.image_url ?? null,
       null,
-      hashValue(card.definition.trim())
+      hashValue(card.definition.trim().toLocaleLowerCase())
     );
     quizzes.push(quiz);
   });
