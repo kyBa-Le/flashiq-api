@@ -20,24 +20,27 @@ model User {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   googleId          String?
+  FCMToken          FCMToken[]
   refreshToken      RefreshToken[]
   Set               Set[]
   studyRecords      StudyRecord[]
+  Access            Access[]
 }
 
 model Set {
-  id           String        @id @default(uuid())
-  title        String
-  description  String?
-  ownerId      String
-  isPublic     Boolean       @default(false)
-  viewCount    Int           @default(0)
-  cloneCount   Int           @default(0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  cards        Card[]
-  User         User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  studyRecords StudyRecord[]
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  ownerId     String
+  isPublic    Boolean  @default(false)
+  viewCount   Int      @default(0)
+  cloneCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  cards       Card[]
+  User        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  studyRecords  StudyRecord[]
+  Access      Access[]
 }
 
 model RefreshToken {
@@ -74,4 +77,30 @@ model StudyRecord {
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, cardId])
+}
+
+model FCMToken {
+  id        String   @id
+  token     String   @unique
+  userId    String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Permission {
+  VIEW
+  EDIT
+}
+
+model Access {
+  id           String     @id @default(uuid())
+  setId        String
+  userId       String
+  permission   Permission @default(VIEW)
+  set          Set        @relation(fields: [setId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([setId, userId])
 }

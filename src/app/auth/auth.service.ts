@@ -87,7 +87,10 @@ export const findByEmailAndPassword = async (
   if (!user) {
     return null;
   }
-  const hashedPassword = await bcrypt.hash(password, user.salt as string);
+  if (!user.password || !user.salt) {
+    throw new Error("Users don't have password (they can login by google)");
+  }
+  const hashedPassword = await bcrypt.hash(password, user.salt);
   if (hashedPassword === user.password) {
     return user;
   }

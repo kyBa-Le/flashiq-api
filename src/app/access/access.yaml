@@ -1,0 +1,59 @@
+paths:
+  /access/set/{id}:
+    get:
+      tags:
+        - Access
+      summary: Get access list for a Set
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+          description: "ID của bộ thẻ (setId)"
+      responses:
+        '200':
+          description: Trả về danh sách người được share kèm Access ID để xóa khi cần
+          content:
+            application/json:
+              example:
+                - id: "access-uuid-123"
+                  permission: "VIEW"
+                  user: { username: "nguyenvana", email: "vana@gmail.com", avatar: "link..." }
+
+  /access:
+    post:
+      tags: 
+        - Access
+      summary: Share Set with another user via Email
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [setId, email, permission]
+              properties:
+                setId: { type: string }
+                email: { type: string }
+                permission: { type: string, enum: [VIEW, EDIT, ADMIN] }
+      responses:
+        '200':
+          description: Cấp quyền thành công
+
+  /access/{accessId}:
+    delete:
+      tags: 
+        - Access
+      summary: Revoke access from a user
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: accessId
+          required: true
+          schema: { type: string }
+          description: "ID duy nhất của bản ghi Access (Lấy từ API GET ở trên)"
+      responses:
+        '200':
+          description: Thu hồi quyền thành công
