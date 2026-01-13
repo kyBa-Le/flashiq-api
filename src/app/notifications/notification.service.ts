@@ -5,6 +5,7 @@ import {
   saveFCMToken,
   createNotification,
   getUserNotifications,
+  markNotificationAsRead,
 } from './notification.repository';
 import { BaseException } from '../../errors/BaseException';
 
@@ -91,5 +92,14 @@ export const getNotificationsForUser = async (userId: string) => {
   } catch (error) {
     console.error('Error retrieving notifications for user:', error);
     throw new BaseException(500, 'Failed to retrieve notifications');
+  }
+};
+
+export const updateNotificationStatus = async (notificationId: string) => {
+  try {
+    return await markNotificationAsRead(notificationId);
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    throw new BaseException(500, 'Failed to mark notification as read');
   }
 };

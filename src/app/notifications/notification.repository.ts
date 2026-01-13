@@ -58,3 +58,10 @@ export const getUserNotifications = async (userId: string) => {
     orderBy: { createdAt: 'desc' },
   });
 };
+
+export const markNotificationAsRead = async (notificationId: string) => {
+  return await prisma.notification.update({
+    where: { id: notificationId },
+    data: { isRead: true },
+  });
+};
