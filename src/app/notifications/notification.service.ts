@@ -3,6 +3,8 @@ import {
   getUserFCMTokens,
   deactivateToken,
   saveFCMToken,
+  createNotification,
+  getUserNotifications,
 } from './notification.repository';
 import { BaseException } from '../../errors/BaseException';
 
@@ -65,5 +67,29 @@ export const registerFCMTokenService = async (
     }
 
     throw new BaseException(500, 'Failed to register FCM token');
+  }
+};
+
+export const saveNotification = async (
+  userId: string,
+  type: string,
+  title: string,
+  message: string,
+  data?: any
+) => {
+  try {
+    return await createNotification(userId, type, title, message, data);
+  } catch (error) {
+    console.error('Error saving notification:', error);
+    throw new BaseException(500, 'Failed to save notification');
+  }
+};
+
+export const getNotificationsForUser = async (userId: string) => {
+  try {
+    return await getUserNotifications(userId);
+  } catch (error) {
+    console.error('Error retrieving notifications for user:', error);
+    throw new BaseException(500, 'Failed to retrieve notifications');
   }
 };

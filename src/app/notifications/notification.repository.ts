@@ -33,3 +33,28 @@ export const deactivateToken = async (token: string) => {
     data: { isActive: false },
   });
 };
+
+export const createNotification = async (
+  userId: string,
+  type: string,
+  title: string,
+  message: string,
+  data?: any
+) => {
+  return await prisma.notification.create({
+    data: {
+      userId,
+      type,
+      title,
+      message,
+      data: data ? JSON.stringify(data) : undefined,
+    },
+  });
+};
+
+export const getUserNotifications = async (userId: string) => {
+  return await prisma.notification.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  });
+};
