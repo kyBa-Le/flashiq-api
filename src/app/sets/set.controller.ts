@@ -113,7 +113,11 @@ export const SetController = {
     try {
       const { userId } = req.params;
 
-      const sets = await SetService.findSharedWithUser(userId);
+      const token = getAccessTokenFromHeader(req);
+      const payload = extractPayloadFromAccessToken(token);
+      const currentUserId = payload.id;
+
+      const sets = await SetService.findSharedWithUser(userId, currentUserId);
 
       return res
         .status(200)

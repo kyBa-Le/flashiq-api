@@ -141,7 +141,6 @@ export const SetRepository = {
   },
 
   async findSharedWithUser(userId: string) {
-    console.log('User id ', userId);
     try {
       const sets = await prisma.set.findMany({
         where: {
@@ -152,8 +151,33 @@ export const SetRepository = {
           },
         },
         orderBy: { createdAt: 'desc' },
+        include: {
+          User: {
+            select: {
+              username: true,
+            },
+          },
+          _count: {
+            select: { cards: true },
+          },
+        },
       });
-      return sets;
+
+      const mapped = sets.map((s: any) => ({
+        id: s.id,
+        title: s.title,
+        description: s.description,
+        ownerId: s.ownerId,
+        ownerName: s.User?.username || '',
+        isPublic: s.isPublic,
+        viewCount: s.viewCount,
+        cloneCount: s.cloneCount,
+        cardCount: s._count?.cards || 0,
+        createdAt: s.createdAt,
+        updatedAt: s.updatedAt,
+      }));
+
+      return mapped;
     } catch {
       console.error('Error retrieving shared sets');
       const err: any = new Error('Unable to retrieve shared sets');

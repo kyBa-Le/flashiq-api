@@ -20,19 +20,56 @@ paths:
                 required:
                   - message
                   - data
-                  
+
   /users/{userId}/sets:
     get:
       tags:
         - Users
       summary: Get Dashboard Sets (A.02)
       security:
-        - bearerAuth: []
+        examples:
+          sample:
+            value:
+              message: Shared sets retrieved successfully
+              data:
+                - id: '123e4567-e89b-12d3-a456-426614174001'
+                  title:
+                    type: string
+                    example: Biology Flashcards
+                  description:
+                    type: string
+                    example: Basic biology terms
+                  ownerId:
+                    type: string
+                    example: '123e4567-e89b-12d3-a456-426614174000'
+                  ownerName:
+                    type: string
+                    example: Alice
+                  isPublic:
+                    type: boolean
+                    example: false
+                  viewCount:
+                    type: integer
+                    example: 10
+                  cloneCount:
+                    type: integer
+                    example: 1
+                  cardCount:
+                    type: integer
+                    example: 42
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: '2024-01-01T00:00:00Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: '2024-01-01T00:00:00Z'
       parameters:
         - in: path
           name: userId
           required: true
-          description: ID của người dùng cần lấy dữ liệu
+          description: ID of the user who retrieve data
           schema:
             type: string
         - in: query
@@ -66,6 +103,8 @@ paths:
       tags:
         - Users
       summary: Get Sets shared with a user
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: userId

@@ -166,8 +166,15 @@ export const SetService = {
     }
   },
 
-  async findSharedWithUser(userId: string) {
+  async findSharedWithUser(userId: string, currentUserId: string) {
     try {
+      if (currentUserId !== userId) {
+        throw new BaseException(
+          403,
+          'You do not have permission to view this data'
+        );
+      }
+
       const user = await getUserById(userId);
       if (!user) {
         throw new BaseException(404, 'User not found');
