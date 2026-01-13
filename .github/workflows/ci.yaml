@@ -63,6 +63,11 @@ jobs:
           MAIL_PASS: test
           GEMINI_API_KEY: test
           GEMINI_MODEL: "gemini-2.5-flash"
+          FIREBASE_PROJECT_ID: test
+          FIREBASE_PRIVATE_KEY_ID: test
+          FIREBASE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nTEST\n-----END PRIVATE KEY-----\n"
+          FIREBASE_CLIENT_EMAIL: test@test.com
+          FIREBASE_CLIENT_ID: test
         run: |
           npm start &
           sleep 8

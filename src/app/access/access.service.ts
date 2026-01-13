@@ -3,6 +3,10 @@ import { AccessRepository } from './access.repository';
 import { SetRepository } from '../sets/set.repository';
 import { ShareSetRequestDto } from './access.dto';
 import { prisma } from '../../utils/prisma';
+import {
+  saveNotification,
+  sendNotificationToUser,
+} from '../notifications/notification.service';
 
 export const AccessService = {
   async shareSet(currentUserId: string, data: ShareSetRequestDto) {
@@ -27,11 +31,25 @@ export const AccessService = {
       );
     }
 
-    return await AccessRepository.grantAccess({
+    const result = await AccessRepository.grantAccess({
       setId,
       userId: userToShare.id,
       permission,
     });
+    const title = 'A set has been shared with you';
+    const message = `"${set.title}" has been shared with you with ${permission.toLowerCase()} access.`;
+
+    await saveNotification(userToShare.id, 'SHARE_SET', title, message, {
+      setId,
+      permission,
+    });
+
+    await sendNotificationToUser(userToShare.id, title, message, {
+      setId,
+      permission,
+    });
+
+    return result;
   },
 
   async getAllInforShared(setId: string, currentUserId: string) {

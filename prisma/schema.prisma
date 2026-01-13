@@ -20,11 +20,12 @@ model User {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   googleId          String?
-  FCMToken          FCMToken[]
   refreshToken      RefreshToken[]
+  fcmTokens         FCMToken[]
   Set               Set[]
   studyRecords      StudyRecord[]
   Access            Access[]
+  notifications Notification[]
 }
 
 model Set {
@@ -80,13 +81,13 @@ model StudyRecord {
 }
 
 model FCMToken {
-  id        String   @id
+  id        String   @id @default(uuid())
   token     String   @unique
   userId    String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Permission {
@@ -103,4 +104,16 @@ model Access {
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([setId, userId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String  
+  title     String
+  message   String
+  data      Json?   
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
