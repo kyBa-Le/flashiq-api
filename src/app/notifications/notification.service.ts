@@ -1,4 +1,4 @@
-import { messaging } from '../../config/firebase';
+import { getMessaging } from '../../config/firebase';
 import {
   getUserFCMTokens,
   deactivateToken,
@@ -26,7 +26,7 @@ export const sendNotificationToUser = async (
       tokens,
     };
 
-    const result = await messaging.sendEachForMulticast(message);
+    const result = await getMessaging().sendEachForMulticast(message);
 
     if (result.failureCount > 0) {
       const invalidTokens = result.responses
