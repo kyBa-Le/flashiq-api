@@ -1,4 +1,50 @@
 paths:
+  /access/set/{id}/permission:
+    get:
+      tags:
+        - Access
+      summary: Get current user permission for a Set
+      description: Returns the current user's permission level for a set. If the user is the owner, returns "OWNER" permission. Otherwise, returns the explicitly granted permission (VIEW or EDIT).
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+          description: 'ID of the set (setId)'
+      responses:
+        '200':
+          description: Return the current user's permission with a set
+          content:
+            application/json:
+              examples:
+                owner:
+                  summary: User is the owner
+                  value:
+                    message: 'Permission retrieved successfully'
+                    data:
+                      setId: 'set-uuid-123'
+                      permission: 'OWNER'
+                      userId: 'user-uuid-456'
+                sharedView:
+                  summary: User has VIEW access
+                  value:
+                    message: 'Permission retrieved successfully'
+                    data:
+                      setId: 'set-uuid-123'
+                      permission: 'VIEW'
+                      userId: 'user-uuid-456'
+                sharedEdit:
+                  summary: User has EDIT access
+                  value:
+                    message: 'Permission retrieved successfully'
+                    data:
+                      setId: 'set-uuid-123'
+                      permission: 'EDIT'
+                      userId: 'user-uuid-456'
+        '404':
+          description: Set is not exist or you don't have permission
+
   /access/set/{id}:
     get:
       tags:
@@ -10,20 +56,25 @@ paths:
           name: id
           required: true
           schema: { type: string }
-          description: "ID của bộ thẻ (setId)"
+          description: 'ID của bộ thẻ (setId)'
       responses:
         '200':
           description: Trả về danh sách người được share kèm Access ID để xóa khi cần
           content:
             application/json:
               example:
-                - id: "access-uuid-123"
-                  permission: "VIEW"
-                  user: { username: "nguyenvana", email: "vana@gmail.com", avatar: "link..." }
+                - id: 'access-uuid-123'
+                  permission: 'VIEW'
+                  user:
+                    {
+                      username: 'nguyenvana',
+                      email: 'vana@gmail.com',
+                      avatar: 'link...',
+                    }
 
   /access:
     post:
-      tags: 
+      tags:
         - Access
       summary: Share Set with another user via Email
       security: [{ bearerAuth: [] }]
@@ -44,7 +95,7 @@ paths:
 
   /access/{accessId}:
     delete:
-      tags: 
+      tags:
         - Access
       summary: Revoke access from a user
       security: [{ bearerAuth: [] }]
@@ -53,7 +104,7 @@ paths:
           name: accessId
           required: true
           schema: { type: string }
-          description: "ID duy nhất của bản ghi Access (Lấy từ API GET ở trên)"
+          description: 'ID duy nhất của bản ghi Access (Lấy từ API GET ở trên)'
       responses:
         '200':
           description: Thu hồi quyền thành công

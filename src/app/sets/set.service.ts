@@ -77,13 +77,6 @@ export const SetService = {
       if (!existingSet) {
         throw new BaseException(404, 'Set not found');
       }
-
-      if (existingSet.ownerId !== currentUserId) {
-        throw new BaseException(
-          403,
-          'You do not have permission to update this set'
-        );
-      }
       return await SetRepository.updateSet(setId, data);
     } catch (error: any) {
       if (error instanceof BaseException) {

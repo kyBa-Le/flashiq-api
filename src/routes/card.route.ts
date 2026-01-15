@@ -10,23 +10,18 @@ import {
   bulkUpdateCardsSchema,
   singleCardSchema,
 } from '../validations/card.schema';
-import { authenticateAccessToken } from '../middlewares/auth.middleware';
+import { authenticate } from '../middlewares/auth.middleware';
 
 const router = Router();
 
 router.put(
   '/bulk',
-  authenticateAccessToken,
+  authenticate,
   validate(bulkUpdateCardsSchema),
   bulkUpdateCards
 );
 
-router.get('/:id', authenticateAccessToken, getSingleCardById);
-router.delete('/:id', authenticateAccessToken, deleteCard);
-router.put(
-  '/:id',
-  validate(singleCardSchema),
-  authenticateAccessToken,
-  updateCard
-);
+router.get('/:id', authenticate, getSingleCardById);
+router.delete('/:id', authenticate, deleteCard);
+router.put('/:id', validate(singleCardSchema), authenticate, updateCard);
 export default router;

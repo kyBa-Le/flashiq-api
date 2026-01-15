@@ -1,16 +1,9 @@
 import { Request, Response } from 'express';
-import {
-  extractPayloadFromAccessToken,
-  getAccessTokenFromHeader,
-} from '../../utils/jwtHelper';
 import { SetService } from './set.service';
 
 export const SetController = {
   async create(req: Request, res: Response) {
-    const token = getAccessTokenFromHeader(req);
-    const payload = extractPayloadFromAccessToken(token);
-
-    const createData = { ...req.body, ownerId: payload.id };
+    const createData = { ...req.body, ownerId: req.user!.id };
     const data = await SetService.createSet(createData);
 
     return res.status(201).json({
@@ -20,9 +13,7 @@ export const SetController = {
   },
 
   async getSetByUser(req: Request, res: Response) {
-    const token = getAccessTokenFromHeader(req);
-    const payload = extractPayloadFromAccessToken(token);
-    const currentUserId = payload.id;
+    const currentUserId = req.user!.id;
     const userId = req.params.userId;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -58,9 +49,7 @@ export const SetController = {
 
   async updateSet(req: Request, res: Response) {
     const { id } = req.params;
-    const token = getAccessTokenFromHeader(req);
-    const payload = extractPayloadFromAccessToken(token);
-    const currentUserId = payload.id;
+    const currentUserId = req.user!.id;
 
     const data = await SetService.updateSet(id, currentUserId, req.body);
 
@@ -69,9 +58,7 @@ export const SetController = {
 
   async deleteSet(req: Request, res: Response) {
     const { id } = req.params;
-    const token = getAccessTokenFromHeader(req);
-    const payload = extractPayloadFromAccessToken(token);
-    const currentUserId = payload.id;
+    const currentUserId = req.user!.id;
 
     const deletedSet = await SetService.deleteSet(id, currentUserId);
 
@@ -112,10 +99,7 @@ export const SetController = {
   async getSharedSets(req: Request, res: Response) {
     try {
       const { userId } = req.params;
-
-      const token = getAccessTokenFromHeader(req);
-      const payload = extractPayloadFromAccessToken(token);
-      const currentUserId = payload.id;
+      const currentUserId = req.user!.id;
 
       const sets = await SetService.findSharedWithUser(userId, currentUserId);
 
