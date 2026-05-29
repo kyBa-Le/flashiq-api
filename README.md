@@ -1,4 +1,4 @@
-# ENOSTA PROJECT: FlashIQ
+# FlashIQ
 A platform that helps learners memorize English vocabulary through flashcards and immediately apply that vocabulary in automatically generated reading contexts (using AI).
 
 ## 🛠️ Installation for Backend development
